@@ -16,7 +16,7 @@ services:
       context: .
     tty: True
     ports:
-      - "9090:9090"
+      - "9091:9090"
     volumes:
       - .:/app
       - grpc-connect-envoy-thanks-modules:/go
@@ -27,7 +27,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
+      - ./backends/envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
     depends_on:
       - greet
       - thanks
