@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  server:
+  greet:
     build:
       context: .
     tty: True
@@ -9,7 +9,17 @@ services:
       - "9090:9090"
     volumes:
       - .:/app
-      - grpc-connect-envoy-server-modules:/go
+      - grpc-connect-envoy-greet-modules:/go
+  
+  thanks:
+    build:
+      context: .
+    tty: True
+    ports:
+      - "9090:9090"
+    volumes:
+      - .:/app
+      - grpc-connect-envoy-thanks-modules:/go
 
   envoy:
     image: envoyproxy/envoy:v1.26.0
@@ -19,7 +29,8 @@ services:
     volumes:
       - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
     depends_on:
-      - server
+      - greet
+      - thanks
 
   client:
     build:
@@ -32,5 +43,6 @@ services:
       - envoy
 
 volumes:
-  grpc-connect-envoy-server-modules:
+  grpc-connect-envoy-greet-modules:
+  grpc-connect-envoy-thanks-modules:
   grpc-connect-envoy-client-modules:

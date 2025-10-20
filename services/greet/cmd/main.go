@@ -1,0 +1,78 @@
+package main
+
+import (
+	"context"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+	"time"
+
+	"github.com/horirinn2000/grpc-connect-envoy/services/greet/internal/greet"
+	greethandler "github.com/horirinn2000/grpc-connect-envoy/services/greet/pkg/greet_handler"
+)
+
+type requestTracker struct {
+	wg *sync.WaitGroup
+	h  http.Handler
+}
+
+func (t *requestTracker) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	t.wg.Add(1)
+	defer t.wg.Done()
+	t.h.ServeHTTP(w, r)
+}
+
+func main() {
+	svc := greet.NewService()
+	path, handler := greethandler.NewHandler(svc)
+
+	var wg sync.WaitGroup
+	trackedHandler := &requestTracker{wg: &wg, h: handler}
+
+	mux := http.NewServeMux()
+	mux.Handle(path, trackedHandler)
+
+	s := http.Server{
+		Addr:    "0.0.0.0:9090",
+		Handler: mux,
+	}
+
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		log.Printf("GRPC Server Start\n")
+		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("failed to serve: %v\n", err)
+		}
+	}()
+
+	//graceful shutdown
+	log.Printf("SIGNAL SIGTERM:%d received, then shutting down...\n", <-signalChan)
+
+	shutdownTimeout := 10 * time.Second
+	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+	defer cancel()
+
+	if err := s.Shutdown(ctx); err != nil {
+		log.Printf("server shutdown error: %v", err)
+	}
+
+	done := make(chan struct{})
+	go func() {
+		wg.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		log.Println("all in-flight requests finished")
+	case <-ctx.Done():
+		log.Println("graceful timeout reached; some requests may be terminated")
+	}
+
+	log.Println("shutdown complete")
+}

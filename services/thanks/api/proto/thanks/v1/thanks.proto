@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package thanks.v1;
+
+option go_package = "github.com/horirinn2000/grpc-connect-envoy/services/thanks/api/gen/thanks/v1;thanksv1";
+
+message ThanksRequest {
+  string name = 1;
+}
+
+message ThanksResponse {
+  string thanks = 1;
+}
+
+service ThanksService {
+  rpc Thanks(ThanksRequest) returns (ThanksResponse) {}
+}
