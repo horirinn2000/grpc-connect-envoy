@@ -1,0 +1,7 @@
+go 1.25.3
+
+use (
+	./services/greet
+	./services/thanks
+	./frontends/go-cli
+)

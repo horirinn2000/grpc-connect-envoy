@@ -19,7 +19,7 @@ func main() {
 func callGreet() {
 	client := greetv1connect.NewGreetServiceClient(
 		http.DefaultClient,
-		"http://envoy:8080",
+		"http://envoy-client:8080",
 	)
 	res, err := client.Greet(
 		context.Background(),
@@ -35,7 +35,7 @@ func callGreet() {
 func callThanks() {
 	client := thanksv1connect.NewThanksServiceClient(
 		http.DefaultClient,
-		"http://envoy:8080",
+		"http://envoy-client:8080",
 	)
 	res, err := client.Thanks(
 		context.Background(),

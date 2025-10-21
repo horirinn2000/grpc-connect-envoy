@@ -21,8 +21,10 @@ profile.cov
 # vendor/
 
 # Go workspace file
-go.work
 go.work.sum
+
+# Go air
+tmp
 
 # env file
 .env

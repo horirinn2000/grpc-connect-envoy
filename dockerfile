@@ -13,4 +13,7 @@ RUN go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 RUN go install connectrpc.com/connect/cmd/protoc-gen-connect-go@latest
 
+# air
+RUN go install github.com/air-verse/air@latest
+
 WORKDIR /app

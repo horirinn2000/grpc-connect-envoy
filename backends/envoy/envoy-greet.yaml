@@ -16,20 +16,9 @@ static_resources:
                     - name: backend
                       domains: ["*"]
                       routes:
-                        - match: { prefix: "/greet.v1.GreetService/" }
+                        - match: { prefix: "/" }
                           route:
                             cluster: greet_service
-                            retry_policy:
-                              retry_on: "5xx"
-                              num_retries: 3
-                              per_try_timeout: 1s
-                        - match: { prefix: "/thanks.v1.ThanksService/" }
-                          route:
-                            cluster: thanks_service
-                            retry_policy:
-                              retry_on: "5xx"
-                              num_retries: 3
-                              per_try_timeout: 1s
                 http_filters:
                   - name: envoy.filters.http.router
                     typed_config:
@@ -47,17 +36,4 @@ static_resources:
                   address:
                     socket_address:
                       address: greet
-                      port_value: 9090
-    - name: thanks_service
-      connect_timeout: 1s
-      type: STRICT_DNS
-      lb_policy: ROUND_ROBIN
-      load_assignment:
-        cluster_name: thanks_service
-        endpoints:
-          - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: thanks
                       port_value: 9090
