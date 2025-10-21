@@ -2,13 +2,13 @@
 connectとenvoyを使ったweb-grpc実装
 
             ┌─────────┐   ┌──────────────────────────┐
-            │ client  │   │      (Docker Network)      │
+            │ client  │   │      (Docker Network)    │
             │   app   │   │                          │
             └────┬────┘   │ ┌─────────┐  ┌─────────┐ │
                  │        │ │ greet   │  │ envoy   │ │
             ┌────▼────┐   │ │ service │<-│ sidecar │ │
             │ client  │   │ └─────────┘  └────▲────┘ │
-            │  envoy  │───┼────────────────────┘      │
+            │  envoy  │───┼────────────────────┘     │
             └─────────┘   │ ┌─────────┐  ┌────▼────┐ │
                           │ │ thanks  │  │ envoy   │ │
                           │ │ service │<-│ sidecar │ │
