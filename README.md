@@ -2,7 +2,7 @@
 
 ## 概要
 
-connectとenvoyを使ったweb-grpc実装
+connectとenvoyを使ったMicroService実装
 
 ## 構成図
             ┌─────────┐   ┌──────────────────────────┐
