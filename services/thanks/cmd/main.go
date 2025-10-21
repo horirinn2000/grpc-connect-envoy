@@ -37,9 +37,15 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle(path, trackedHandler)
 
+	p := new(http.Protocols)
+	p.SetHTTP1(true)
+	// Use h2c so we can serve HTTP/2 without TLS.
+	p.SetUnencryptedHTTP2(true)
+
 	s := http.Server{
-		Addr:    "0.0.0.0:9090",
-		Handler: mux,
+		Addr:      "0.0.0.0:9090",
+		Handler:   mux,
+		Protocols: p,
 	}
 
 	signalChan := make(chan os.Signal, 1)
