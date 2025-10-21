@@ -8,7 +8,7 @@ connectとenvoyを使ったweb-grpc実装
                  │        │ │ greet   │  │ envoy   │ │
             ┌────▼────┐   │ │ service │<-│ sidecar │ │
             │ client  │   │ └─────────┘  └────▲────┘ │
-            │  envoy  │───┼────────────────────┘     │
+            │  envoy  │───┼───────────────────┤      │
             └─────────┘   │ ┌─────────┐  ┌────▼────┐ │
                           │ │ thanks  │  │ envoy   │ │
                           │ │ service │<-│ sidecar │ │
