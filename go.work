@@ -1,6 +1,7 @@
 go 1.25.3
 
 use (
+	./services/auth
 	./services/greet
 	./services/thanks
 	./frontends/go-cli

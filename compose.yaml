@@ -35,6 +35,15 @@ services:
     depends_on:
       - thanks
   
+  auth:
+    build:
+      context: .
+    tty: true
+    volumes:
+      - ./services/auth:/app
+      - grpc-connect-envoy-auth-modules:/go
+    command: bash -c "air"
+  
   envoy-client:
     image: envoyproxy/envoy:v1.26.0
     tty: true
@@ -45,6 +54,7 @@ services:
     depends_on:
       - envoy-greet
       - envoy-thanks
+      - auth
 
   client:
     build:
@@ -57,6 +67,7 @@ services:
       - envoy-client
 
 volumes:
+  grpc-connect-envoy-auth-modules:
   grpc-connect-envoy-greet-modules:
   grpc-connect-envoy-thanks-modules:
   grpc-connect-envoy-client-modules:
