@@ -1,6 +1,7 @@
 # grpc-connect-envoy
 connectとenvoyを使ったweb-grpc実装
 
+## 構成図
             ┌─────────┐   ┌──────────────────────────┐
             │ client  │   │      (Docker Network)    │
             │   app   │   │                          │
@@ -15,3 +16,7 @@ connectとenvoyを使ったweb-grpc実装
                           │ └─────────┘  └─────────┘ │
                           │                          │
                           └──────────────────────────┘
+
+## 参考URL
+https://connectrpc.com/docs/introduction
+https://www.envoyproxy.io/
