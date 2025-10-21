@@ -8,6 +8,7 @@ services:
     volumes:
       - ./services/greet:/app
       - grpc-connect-envoy-greet-modules:/go
+    command: bash -c "air"
 
   envoy-greet:
     image: envoyproxy/envoy:v1.26.0
@@ -24,6 +25,7 @@ services:
     volumes:
       - ./services/thanks:/app
       - grpc-connect-envoy-thanks-modules:/go
+    command: bash -c "air"
 
   envoy-thanks:
     image: envoyproxy/envoy:v1.26.0
