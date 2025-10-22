@@ -47,18 +47,7 @@ static_resources:
                           audiences:
                             - greet-service
                           local_jwks:
-                            inline_string: |
-                              {
-                                "keys": [
-                                  {
-                                    "kty": "RSA",
-                                    "kid": "auth-key",
-                                    "use": "sig",
-                                    "n": "qucEsZSzsLgswWfnN1C4QUluoYrZXxvfuhVPPhf7L8H6EsOUJv2Xe7d-FmFtuDliYyT0K_m8EcwlQb7OT7pdGJExY_LAaf7s_B6wz8_et34RApsQno9N-OZAmKJRWiI418Xxa2mqqkdmbB06tnb0djr1LaTKoYhVcshwRC9iZL8YJtU1Hq3jJm1JblAuL8L5NHJozRKsyFiVaTEBFKH49Vf6tEc43IGcGXjr5YbAiwQE9SeGq12I-bSoVj69npbOrgxA_qkDxWrq5COgBhm41oINpaMFWO-0FO_67fKvMMEz8bFWG0OQ4zPO5OW_avb9pBWUouStQFWULJ4028rbqQ",
-                                    "e": "AQAB"
-                                  }
-                                ]
-                              }
+                            filename: /etc/envoy/keys/public.jwks.json
                           forward: true
                       rules:
                         - match: { prefix: "/greet.v1.GreetService/" }
