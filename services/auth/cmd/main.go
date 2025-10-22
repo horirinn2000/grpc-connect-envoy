@@ -10,9 +10,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/horirinn2000/grpc-connect-envoy/services/auth/internal/auth"
 	"github.com/horirinn2000/grpc-connect-envoy/services/auth/internal/config"
+	"github.com/horirinn2000/grpc-connect-envoy/services/auth/internal/key"
 	authhandler "github.com/horirinn2000/grpc-connect-envoy/services/auth/pkg/auth_handler"
 )
 
@@ -33,13 +33,9 @@ func main() {
 		log.Fatalf("failed to load config: %v", err)
 	}
 
-	privateKeyData, err := os.ReadFile(cfg.JWT.PrivateKeyPath)
+	privateKey, err := key.LoadPrivateKey(cfg.JWT.PrivateKeyPath)
 	if err != nil {
-		log.Fatalf("failed to read private key: %v", err)
-	}
-	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyData)
-	if err != nil {
-		log.Fatalf("failed to parse private key: %v", err)
+		log.Fatalf("failed to load private key: %v", err)
 	}
 
 	svc := auth.NewService(privateKey, cfg.Auth.Username, cfg.Auth.Password, cfg.JWT.TokenExp)
