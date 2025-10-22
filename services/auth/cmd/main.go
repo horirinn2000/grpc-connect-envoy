@@ -12,6 +12,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/horirinn2000/grpc-connect-envoy/services/auth/internal/auth"
+	"github.com/horirinn2000/grpc-connect-envoy/services/auth/internal/config"
 	authhandler "github.com/horirinn2000/grpc-connect-envoy/services/auth/pkg/auth_handler"
 )
 
@@ -27,7 +28,12 @@ func (t *requestTracker) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	privateKeyData, err := os.ReadFile("keys/private.pem")
+	cfg, err := config.New()
+	if err != nil {
+		log.Fatalf("failed to load config: %v", err)
+	}
+
+	privateKeyData, err := os.ReadFile(cfg.JWT.PrivateKeyPath)
 	if err != nil {
 		log.Fatalf("failed to read private key: %v", err)
 	}
@@ -36,7 +42,7 @@ func main() {
 		log.Fatalf("failed to parse private key: %v", err)
 	}
 
-	svc := auth.NewService(privateKey)
+	svc := auth.NewService(privateKey, cfg.Auth.Username, cfg.Auth.Password, cfg.JWT.TokenExp)
 	path, handler := authhandler.NewHandler(svc)
 
 	var wg sync.WaitGroup
@@ -51,7 +57,7 @@ func main() {
 	p.SetUnencryptedHTTP2(true)
 
 	s := http.Server{
-		Addr:      "0.0.0.0:9090",
+		Addr:      "0.0.0.0:" + cfg.Server.Port,
 		Handler:   mux,
 		Protocols: p,
 	}

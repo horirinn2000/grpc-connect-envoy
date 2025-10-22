@@ -1,0 +1,10 @@
+server:
+  port: "9090"
+
+auth:
+  username: "user"
+  password: "password"
+
+jwt:
+  private_key_path: "keys/private.pem"
+  token_exp: 24h

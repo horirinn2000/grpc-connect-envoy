@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"crypto/rsa"
+	"time"
 )
 
 type AuthRepo interface {
@@ -11,8 +12,16 @@ type AuthRepo interface {
 
 type AuthService struct {
 	privateKey *rsa.PrivateKey
+	username   string
+	password   string
+	tokenExp   time.Duration
 }
 
-func NewService(p *rsa.PrivateKey) *AuthService {
-	return &AuthService{privateKey: p}
+func NewService(p *rsa.PrivateKey, username, password string, tokenExp time.Duration) *AuthService {
+	return &AuthService{
+		privateKey: p,
+		username:   username,
+		password:   password,
+		tokenExp:   tokenExp,
+	}
 }

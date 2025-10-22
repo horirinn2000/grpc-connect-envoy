@@ -44,6 +44,14 @@ services:
       - grpc-connect-envoy-auth-modules:/go
     command: bash -c "air"
   
+  envoy-auth:
+    image: envoyproxy/envoy:v1.26.0
+    tty: true
+    volumes:
+      - ./backends/envoy/envoy-auth.yaml:/etc/envoy/envoy.yaml:ro
+    depends_on:
+      - auth
+
   envoy-client:
     image: envoyproxy/envoy:v1.26.0
     tty: true
