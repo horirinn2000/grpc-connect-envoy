@@ -86,4 +86,17 @@ func main() {
 	} else {
 		log.Println("Thanks response:", resThanks.Thanks)
 	}
+
+	// 4. Refresh
+	// 1. Refresh
+	_, err = authClient.RefreshToken(
+		context.Background(),
+		&authv1.RefreshTokenRequest{
+			RefreshToken: authRes.RefreshToken,
+		},
+	)
+	if err != nil {
+		log.Fatalf("failed to authenticate: %v", err)
+	}
+	log.Println("Successfully refresh")
 }

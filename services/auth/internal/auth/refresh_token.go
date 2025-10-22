@@ -7,13 +7,14 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func (s *AuthService) Authentication(ctx context.Context, username string, password string) (string, string, error) {
-	if username != s.username || password != s.password {
+func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (string, string, error) {
+	username, ok := s.refreshToken[refreshToken]
+	if !ok {
 		return "", "", ErrInvalidInput
 	}
 
-	// Create a new token object, specifying signing method and the claims
-	// you would like it to contain.
+	delete(s.refreshToken, refreshToken)
+
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"sub": username,
 		"iss": "auth-service",
@@ -23,13 +24,12 @@ func (s *AuthService) Authentication(ctx context.Context, username string, passw
 		"iat": time.Now().Unix(),
 	})
 
-	// Sign and get the complete encoded token as a string using the private key
 	tokenString, err := token.SignedString(s.privateKey)
 	if err != nil {
 		return "", "", ErrInternal
 	}
 
-	refreshToken := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
+	newRefreshToken := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"sub": username,
 		"iss": "auth-service",
 		"aud": []string{"greet-service"},
@@ -38,12 +38,12 @@ func (s *AuthService) Authentication(ctx context.Context, username string, passw
 		"iat": time.Now().Unix(),
 	})
 
-	refreshTokenString, err := refreshToken.SignedString(s.privateKey)
+	newRefreshTokenString, err := newRefreshToken.SignedString(s.privateKey)
 	if err != nil {
 		return "", "", ErrInternal
 	}
 
-	s.refreshToken[refreshTokenString] = username
+	s.refreshToken[newRefreshTokenString] = username
 
-	return tokenString, refreshTokenString, nil
+	return tokenString, newRefreshTokenString, nil
 }

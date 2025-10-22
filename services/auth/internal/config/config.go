@@ -23,8 +23,9 @@ type AuthConfig struct {
 }
 
 type JWTConfig struct {
-	PrivateKeyPath string        `yaml:"private_key_path"`
-	TokenExp       time.Duration `yaml:"token_exp"`
+	PrivateKeyPath  string        `yaml:"private_key_path"`
+	TokenExp        time.Duration `yaml:"token_exp"`
+	RefreshTokenExp time.Duration `yaml:"refresh_token_exp"`
 }
 
 func New() (*Config, error) {

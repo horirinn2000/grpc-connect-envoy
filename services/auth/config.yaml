@@ -8,3 +8,4 @@ auth:
 jwt:
   private_key_path: "keys/private.pem"
   token_exp: 24h
+  refresh_token_exp: 168h

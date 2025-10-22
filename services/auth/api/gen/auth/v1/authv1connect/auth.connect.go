@@ -36,11 +36,15 @@ const (
 	// AuthServiceAuthenticateProcedure is the fully-qualified name of the AuthService's Authenticate
 	// RPC.
 	AuthServiceAuthenticateProcedure = "/auth.v1.AuthService/Authenticate"
+	// AuthServiceRefreshTokenProcedure is the fully-qualified name of the AuthService's RefreshToken
+	// RPC.
+	AuthServiceRefreshTokenProcedure = "/auth.v1.AuthService/RefreshToken"
 )
 
 // AuthServiceClient is a client for the auth.v1.AuthService service.
 type AuthServiceClient interface {
 	Authenticate(context.Context, *v1.AuthenticateRequest) (*v1.AuthenticateResponse, error)
+	RefreshToken(context.Context, *v1.RefreshTokenRequest) (*v1.RefreshTokenResponse, error)
 }
 
 // NewAuthServiceClient constructs a client for the auth.v1.AuthService service. By default, it uses
@@ -60,12 +64,19 @@ func NewAuthServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(authServiceMethods.ByName("Authenticate")),
 			connect.WithClientOptions(opts...),
 		),
+		refreshToken: connect.NewClient[v1.RefreshTokenRequest, v1.RefreshTokenResponse](
+			httpClient,
+			baseURL+AuthServiceRefreshTokenProcedure,
+			connect.WithSchema(authServiceMethods.ByName("RefreshToken")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // authServiceClient implements AuthServiceClient.
 type authServiceClient struct {
 	authenticate *connect.Client[v1.AuthenticateRequest, v1.AuthenticateResponse]
+	refreshToken *connect.Client[v1.RefreshTokenRequest, v1.RefreshTokenResponse]
 }
 
 // Authenticate calls auth.v1.AuthService.Authenticate.
@@ -77,9 +88,19 @@ func (c *authServiceClient) Authenticate(ctx context.Context, req *v1.Authentica
 	return nil, err
 }
 
+// RefreshToken calls auth.v1.AuthService.RefreshToken.
+func (c *authServiceClient) RefreshToken(ctx context.Context, req *v1.RefreshTokenRequest) (*v1.RefreshTokenResponse, error) {
+	response, err := c.refreshToken.CallUnary(ctx, connect.NewRequest(req))
+	if response != nil {
+		return response.Msg, err
+	}
+	return nil, err
+}
+
 // AuthServiceHandler is an implementation of the auth.v1.AuthService service.
 type AuthServiceHandler interface {
 	Authenticate(context.Context, *v1.AuthenticateRequest) (*v1.AuthenticateResponse, error)
+	RefreshToken(context.Context, *v1.RefreshTokenRequest) (*v1.RefreshTokenResponse, error)
 }
 
 // NewAuthServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -95,10 +116,18 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(authServiceMethods.ByName("Authenticate")),
 		connect.WithHandlerOptions(opts...),
 	)
+	authServiceRefreshTokenHandler := connect.NewUnaryHandlerSimple(
+		AuthServiceRefreshTokenProcedure,
+		svc.RefreshToken,
+		connect.WithSchema(authServiceMethods.ByName("RefreshToken")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/auth.v1.AuthService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AuthServiceAuthenticateProcedure:
 			authServiceAuthenticateHandler.ServeHTTP(w, r)
+		case AuthServiceRefreshTokenProcedure:
+			authServiceRefreshTokenHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -110,4 +139,8 @@ type UnimplementedAuthServiceHandler struct{}
 
 func (UnimplementedAuthServiceHandler) Authenticate(context.Context, *v1.AuthenticateRequest) (*v1.AuthenticateResponse, error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.AuthService.Authenticate is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) RefreshToken(context.Context, *v1.RefreshTokenRequest) (*v1.RefreshTokenResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.AuthService.RefreshToken is not implemented"))
 }

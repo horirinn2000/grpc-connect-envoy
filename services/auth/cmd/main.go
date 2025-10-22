@@ -38,7 +38,7 @@ func main() {
 		log.Fatalf("failed to load private key: %v", err)
 	}
 
-	svc := auth.NewService(privateKey, cfg.Auth.Username, cfg.Auth.Password, cfg.JWT.TokenExp)
+	svc := auth.NewService(privateKey, cfg.Auth.Username, cfg.Auth.Password, cfg.JWT.TokenExp, cfg.JWT.RefreshTokenExp)
 	path, handler := authhandler.NewHandler(svc)
 
 	var wg sync.WaitGroup

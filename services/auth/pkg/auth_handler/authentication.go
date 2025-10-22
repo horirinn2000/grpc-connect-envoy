@@ -19,11 +19,12 @@ func (h *Handler) Authenticate(
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("password is required"))
 	}
 
-	tokenString, err := h.service.Authentication(ctx, req.Username, req.Password)
+	tokenString, refreshTokenString, err := h.service.Authentication(ctx, req.Username, req.Password)
 	if err != nil {
 		return nil, h.mapErrorToConnectCode(err)
 	}
 	return &authv1.AuthenticateResponse{
-		Token: tokenString,
+		Token:        tokenString,
+		RefreshToken: refreshTokenString,
 	}, nil
 }
