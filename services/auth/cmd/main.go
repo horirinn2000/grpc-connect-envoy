@@ -46,6 +46,10 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle(path, trackedHandler)
+	mux.HandleFunc("/.well-known/jwks.json", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		http.ServeFile(w, r, "keys/public.jwks.json")
+	})
 
 	p := new(http.Protocols)
 	p.SetHTTP1(true)

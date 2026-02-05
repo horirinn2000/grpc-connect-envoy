@@ -20,10 +20,43 @@ static_resources:
                           route:
                             cluster: greet_service
                 http_filters:
+                  - name: envoy.filters.http.jwt_authn
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
+                      providers:
+                        provider1:
+                          issuer: auth-service
+                          audiences:
+                            - greet-service
+                          remote_jwks:
+                            http_uri:
+                              uri: http://auth:9090/.well-known/jwks.json
+                              cluster: auth_service
+                              timeout: 5s
+                            cache_duration:
+                              seconds: 300
+                          forward: true
+                      rules:
+                        - match: { prefix: "/" }
+                          requires:
+                            provider_name: "provider1"
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
   clusters:
+    - name: auth_service
+      connect_timeout: 1s
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: auth_service
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: auth
+                      port_value: 9090
     - name: greet_service
       connect_timeout: 1s
       type: STRICT_DNS

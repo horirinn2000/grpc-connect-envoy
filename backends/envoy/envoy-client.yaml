@@ -38,21 +38,6 @@ static_resources:
                               num_retries: 3
                               per_try_timeout: 1s
                 http_filters:
-                  - name: envoy.filters.http.jwt_authn
-                    typed_config:
-                      "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
-                      providers:
-                        provider1:
-                          issuer: auth-service
-                          audiences:
-                            - greet-service
-                          local_jwks:
-                            filename: /etc/envoy/keys/public.jwks.json
-                          forward: true
-                      rules:
-                        - match: { prefix: "/greet.v1.GreetService/" }
-                          requires:
-                            provider_name: "provider1"
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
