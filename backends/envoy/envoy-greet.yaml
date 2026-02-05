@@ -30,7 +30,7 @@ static_resources:
                             - greet-service
                           remote_jwks:
                             http_uri:
-                              uri: http://auth:9090/.well-known/jwks.json
+                              uri: http://envoy-auth:8080/.well-known/jwks.json
                               cluster: auth_service
                               timeout: 5s
                             cache_duration:
@@ -55,8 +55,8 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: auth
-                      port_value: 9090
+                      address: envoy-auth
+                      port_value: 8080
     - name: greet_service
       connect_timeout: 1s
       type: STRICT_DNS
