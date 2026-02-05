@@ -64,19 +64,6 @@ Docker Compose を使用して全サービスを起動します。
 docker compose up --build
 ```
 
-起動すると、`client` コンテナが自動的に以下のフローを実行し、ログに出力します。
-
-1. `auth` サービスでログインし、JWT トークンを取得
-2. トークンを使用して `greet` サービスへリクエスト（成功）
-3. トークンなしで `thanks` サービスへリクエスト（成功）
-4. トークンのリフレッシュ
-
-### ログの確認
-
-```bash
-docker compose logs -f client
-```
-
 ### 手動での動作確認 (curl)
 
 ホストマシンから `localhost:8080` に対してリクエストを送ることで動作確認が可能です。
@@ -104,11 +91,37 @@ docker compose logs -f client
      -d '{"name": "World"}'
    ```
 
+4. **Greet (認証なし)**
+   ```bash
+   curl -X POST http://localhost:8080/greet.v1.GreetService/Greet \
+     -H "Content-Type: application/json" \
+     -d '{"name": "World"}'
+   ```
+
+### 手動での動作確認 (grpc)
+
+`client` コンテナに接続し、Connect (gRPC) クライアントとして実装された CLI ツールを実行して動作確認を行います。
+
+1. **client コンテナに接続**
+   ```bash
+   docker compose exec -it client bash
+   ```
+
+2. **CLI ツールの実行**
+   ```bash
+   go run frontends/go-cli/cmd/main.go
+   ```
+   実行すると、以下のフローが自動的に検証されます：
+   - `auth` サービスでの認証とトークン取得
+   - 取得したトークンを使用した `greet` サービス（認証あり）へのアクセス
+   - `thanks` サービス（認証なし）へのアクセス
+   - `auth` サービスでのトークンリフレッシュ
+
 ## 技術詳細
 
-### 認証フローの変更点
+### 認証フロー
 
-以前は Gateway (`envoy-client`) で一括して認証を行っていましたが、ゼロトラストの観点から **Sidecar (`envoy-greet`) での認証** に変更しました。
+ゼロトラストの観点から **Sidecar (`envoy-greet`) での認証** 。
 
 1. `auth` サービスに `/.well-known/jwks.json` エンドポイントを追加。
 2. `envoy-greet` は `remote_jwks` 設定により、`auth` サービスから動的に公開鍵を取得。
